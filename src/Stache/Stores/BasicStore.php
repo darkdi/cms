@@ -111,17 +111,25 @@ abstract class BasicStore extends Store
 
     public function save($item)
     {
-        $this->writeItemToDisk($item);
-
         $key = $this->getItemKey($item);
+        $isNew = ! $this->paths()->has($key);
+
+        $this->writeItemToDisk($item);
 
         $this->forgetItem($key);
 
         $this->setPath($key, $item->path());
 
+        $this->beforeUpdatingIndexes($item, $isNew);
+
         $this->resolveIndexes()->each->updateItem($item);
 
         $this->cacheItem($item);
+    }
+
+    protected function beforeUpdatingIndexes($item, bool $isNew)
+    {
+        //
     }
 
     public function delete($item)

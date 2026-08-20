@@ -156,6 +156,19 @@ class CollectionEntriesStore extends ChildStore
         });
     }
 
+    protected function beforeUpdatingIndexes($item, bool $isNew)
+    {
+        if (! $isNew || ! $this->collection()->hasStructure()) {
+            return;
+        }
+
+        $locale = $item->locale();
+        $handle = $this->childKey();
+
+        Blink::forget("collection-structure-tree-entries::{$handle}::{$locale}");
+        Blink::forget("structure-{$handle}-{$locale}-*");
+    }
+
     protected function storeIndexes()
     {
         $indexes = collect([
